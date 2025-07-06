@@ -1,9 +1,31 @@
+
+buildscript {
+    ext.kotlin_version = '1.8.22' // Or downgrade to '1.7.10' if needed
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.android.tools.build:gradle:8.0.2' // Match your existing gradle version
+    }
+}
+
 allprojects {
     repositories {
         google()
         mavenCentral()
     }
+
+    configurations.all {
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group == 'org.jetbrains.kotlin') {
+                details.useVersion kotlin_version
+            }
+        }
+    }
 }
+
 
 rootProject.buildDir = "../build"
 subprojects {
