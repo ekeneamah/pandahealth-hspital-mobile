@@ -1,0 +1,71 @@
+name: 📦 Build & Distribute Flutter Release APK
+
+on:
+  workflow_dispatch:    # manual trigger from Actions tab
+  push:
+    branches:
+      - master           # or your release branch
+
+jobs:
+  build-and-distribute:
+    name: Build Release APK & Firebase Distribution
+    runs-on: ubuntu-latest
+    env:
+      # Firebase App Distribution
+      FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+      FIREBASE_AUTH_TOKEN: ${{ secrets.FIREBASE_AUTH_TOKEN }}
+      FIREBASE_GROUPS: testers
+
+      # Keystore settings
+      STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
+      KEY_PASSWORD:   ${{ secrets.KEY_PASSWORD }}
+      KEY_ALIAS:      ${{ secrets.KEY_ALIAS }}
+      KEYSTORE_B64:   ${{ secrets.KEYSTORE_BASE64 }}
+
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔐 Restore keystore
+        run: |
+          echo "$KEYSTORE_B64" | base64 --decode > upload-keystore.jks
+          echo "storePassword=$STORE_PASSWORD" > key.properties
+          echo "keyPassword=$KEY_PASSWORD"   >> key.properties
+          echo "keyAlias=$KEY_ALIAS"         >> key.properties
+          echo "storeFile=upload-keystore.jks" >> key.properties
+        working-directory: ${{ github.workspace }}
+
+      - name: 💾 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.22.0'      # adjust as needed
+
+      - name: 🔧 Install dependencies
+        run: flutter pub get
+
+      - name: 🧹 Clean project
+        run: flutter clean
+
+      - name: 🔨 Build release APK
+        run: flutter build apk --release --verbose
+
+      - name: 📂 Prepare output directory
+        run: mkdir -p dist
+
+      - name: 🚚 Copy APK to dist folder
+        run: |
+          cp build/app/outputs/flutter-apk/app-release.apk dist/app-release-${{ github.run_number }}.apk
+
+      - name: 📤 Upload APK as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-apk
+          path: dist/app-release-${{ github.run_number }}.apk
+
+      - name: 🔄 Distribute to Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{ env.FIREBASE_APP_ID }}
+          token: ${{ env.FIREBASE_AUTH_TOKEN }}
+          groups: ${{ env.FIREBASE_GROUPS }}
+          file: dist/app-release-${{ github.run_number }}.apk
