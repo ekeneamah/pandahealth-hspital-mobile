@@ -42,8 +42,12 @@ jobs:
       - name: 🔧 Install dependencies
         run: flutter pub get
 
-      - name: 🧹 Clean project
+      - name: 🧹 Clean Flutter build
         run: flutter clean
+
+      - name: 🧼 Clean Gradle cache
+        run: ./gradlew clean
+        working-directory: android
 
       - name: 🔨 Build release APK
         run: flutter build apk --release --verbose
@@ -67,3 +71,4 @@ jobs:
           token: ${{ env.FIREBASE_AUTH_TOKEN }}
           groups: ${{ env.FIREBASE_GROUPS }}
           file: dist/app-release-${{ github.run_number }}.apk
+            
