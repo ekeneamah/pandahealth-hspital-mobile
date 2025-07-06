@@ -25,10 +25,9 @@ android {
         coreLibraryDesugaringEnabled true
     }
 
-   kotlinOptions {
-    jvmTarget = "1.8" // ✅ More compatible with most plugins
-}
-
+    kotlinOptions {
+        jvmTarget = "17"
+    }
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
