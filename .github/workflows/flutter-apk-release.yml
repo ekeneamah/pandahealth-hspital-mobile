@@ -1,10 +1,10 @@
 name: 📦 Build & Distribute Flutter Release APK
 
 on:
-  workflow_dispatch:    # manual trigger from Actions tab
+  workflow_dispatch:
   push:
     branches:
-      - master           # or your release branch
+      - master
 
 jobs:
   build-and-distribute:
@@ -26,19 +26,18 @@ jobs:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🔐 Restore keystore
+      - name: 🔐 Restore keystore and key.properties to android/
         run: |
-          echo "$KEYSTORE_B64" | base64 --decode > upload-keystore.jks
-          echo "storePassword=$STORE_PASSWORD" > key.properties
-          echo "keyPassword=$KEY_PASSWORD"   >> key.properties
-          echo "keyAlias=$KEY_ALIAS"         >> key.properties
-          echo "storeFile=upload-keystore.jks" >> key.properties
-        working-directory: ${{ github.workspace }}
+          echo "$KEYSTORE_B64" | base64 --decode > android/upload-keystore.jks
+          echo "storePassword=$STORE_PASSWORD" > android/key.properties
+          echo "keyPassword=$KEY_PASSWORD"   >> android/key.properties
+          echo "keyAlias=$KEY_ALIAS"         >> android/key.properties
+          echo "storeFile=upload-keystore.jks" >> android/key.properties
 
       - name: 💾 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.32.5'      # adjust as needed
+          flutter-version: '3.32.5'
 
       - name: 🔧 Install dependencies
         run: flutter pub get
@@ -53,8 +52,7 @@ jobs:
         run: mkdir -p dist
 
       - name: 🚚 Copy APK to dist folder
-        run: |
-          cp build/app/outputs/flutter-apk/app-release.apk dist/app-release-${{ github.run_number }}.apk
+        run: cp build/app/outputs/flutter-apk/app-release.apk dist/app-release-${{ github.run_number }}.apk
 
       - name: 📤 Upload APK as artifact
         uses: actions/upload-artifact@v4
