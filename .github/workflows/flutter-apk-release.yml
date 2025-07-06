@@ -45,9 +45,7 @@ jobs:
       - name: 🧹 Clean Flutter build
         run: flutter clean
 
-      - name: 🧼 Clean Gradle cache
-        run: ./gradlew clean
-        working-directory: android
+     
 
       - name: 🔨 Build release APK
         run: flutter build apk --release --verbose
