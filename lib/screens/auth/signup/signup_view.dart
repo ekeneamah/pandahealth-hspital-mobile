@@ -34,7 +34,7 @@ class _SignUpViewState extends State<SignUpView> {
   final passwordCtrl = TextEditingController();
   final confirmPassCtrl = TextEditingController();
   final addressCtrl = TextEditingController();
-    final accessCodeCtrl = TextEditingController();
+   // final accessCodeCtrl = TextEditingController();
   final phoneController = PhoneController(
     initialValue: const PhoneNumber(
       isoCode: IsoCode.NG,
@@ -68,14 +68,14 @@ class _SignUpViewState extends State<SignUpView> {
       // Step 1: Basic Info
       Column(
         children: [
-          LoginTextField(
+          /* LoginTextField(
               controller: accessCodeCtrl,
               hint: 'Healthcare Access Code',
               autofillHints: const [AutofillHints.organizationName],
               isValidated: accessCodeCtrl.text.isNotEmpty,
               validator: (val) =>
                   val!.isEmpty ? 'Healthcare Centre access code is required' : null,
-              onChanged: (val) => setState(() {})),
+              onChanged: (val) => setState(() {})), */
           const SizedBox(height: 10),
           LoginTextField(
               controller: nameCtrl,
@@ -262,7 +262,7 @@ class _SignUpViewState extends State<SignUpView> {
       }
 
       final hospitalData = {
-         'accessCode': accessCodeCtrl.text.trim(),
+       //  'accessCode': accessCodeCtrl.text.trim(),
         'password': passwordCtrl.text.trim(),
         'name': nameCtrl.text.trim(),
         'email': emailCtrl.text.trim(),
@@ -422,8 +422,8 @@ class _SignUpViewState extends State<SignUpView> {
   bool isStepValid() {
     switch (currentStep) {
       case 0:
-        return nameCtrl.text.isNotEmpty && accessCodeCtrl.text.isNotEmpty &&
-            accessCodeCtrl.text.length == 6 &&
+        return nameCtrl.text.isNotEmpty /* && accessCodeCtrl.text.isNotEmpty &&
+            accessCodeCtrl.text.length == 6 */ &&
             emailCtrl.text.isNotEmpty &&
             emailRegExp.hasMatch(emailCtrl.text) &&
             passwordCtrl.text.isNotEmpty &&

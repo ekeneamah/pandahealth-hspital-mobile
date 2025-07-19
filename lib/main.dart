@@ -69,11 +69,62 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Panda Health Hospital',
       theme: ThemeData(
-          fontFamily: "Product_Sans_Font",
-          primarySwatch: Colors.green,
-          visualDensity: VisualDensity.adaptivePlatformDensity),
+        fontFamily: "Product_Sans_Font",
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.green,
+          primary: Colors.green,
+          secondary: Colors.greenAccent,
+          tertiary: Colors.lightGreen,
+          surface: Colors.white,
+          background: Colors.grey[100]!,
+          error: Colors.redAccent,
+          onPrimary: Colors.white,
+          onSecondary: Colors.black87,
+          onTertiary: Colors.black87,
+          onSurface: Colors.black87,
+          onBackground: Colors.black87,
+        ),
+        brightness: Brightness.light,
+        primarySwatch: Colors.green,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: const Color(0xFF2563EB),
+            foregroundColor: Colors.white,
+            elevation: 2,
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Color(0xFF2563EB), width: 2),
+          ),
+          filled: true,
+          fillColor: Colors.white,
+          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        ),
+        cardTheme: CardTheme(
+          elevation: 4,
+          shadowColor: Colors.black.withOpacity(0.1),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+      ),
       navigatorKey: navigatorKey,
-      home: LoadingScreen(),
+      home: const LoadingScreen(),
     );
 
     // );

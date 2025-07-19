@@ -6,6 +6,7 @@ import 'package:pandahealthhospital/constants/constants.dart';
 import 'package:pandahealthhospital/custom_widgets/spaces.dart';
 import 'package:pandahealthhospital/screens/dashboard/custom_app_bar.dart';
 import 'package:pandahealthhospital/screens/dashboard/username_widget.dart';
+import 'package:pandahealthhospital/screens/drug_interaction/drug_interaction_screen.dart';
 import 'package:pandahealthhospital/screens/hospital/hospital_clerking.dart';
 import 'package:pandahealthhospital/screens/hospital/qr_code_generator.dart';
 import 'package:pandahealthhospital/screens/hospital/view_clerking_reports.dart';
@@ -163,19 +164,23 @@ class _HospitalDashboardViewState extends State<HospitalDashboardView> {
                               "Patient Records",
                               "Access and review previous consultations and AI analyses",
                               Icons.folder_shared_rounded,
-                              () => push(ViewClerkingReports()),
+                              () => push(const ViewClerkingReports()),
                             ),
                             const SizedBox(height: 16),
                             _buildFeatureCard(
-                              "QR Code Generator",
-                              "Generate QR codes for quick access to AI Assessment with your hospital as referrer",
-                              Icons.qr_code_rounded,
-                              () => push(QRCodeGeneratorScreen(
-                                  hospitalId: Provider.of<UserStore>(context,
-                                          listen: false)
-                                      .hospital!
-                                      .id)),
+                              "Drug Interaction Checker",
+                              "Analyze drug interactions with AI-powered assessment and patient context analysis",
+                              Icons.medication_liquid_rounded,
+                              () => push(const DrugInteractionScreen()),
+                              isNew: true,
                             ),
+                            const SizedBox(height: 16),
+                            /* _buildFeatureCard(
+                              "QR Code Generator",
+                              "Generate QR codes for quick access to medical records and referrals",
+                              Icons.qr_code_rounded,
+                              () => push(const QRCodeGenerator()),
+                            ), */
                           ],
                         ),
                       ),
@@ -242,7 +247,12 @@ class _HospitalDashboardViewState extends State<HospitalDashboardView> {
       );
 
   Widget _buildFeatureCard(
-      String title, String description, IconData icon, VoidCallback onTap) {
+    String title, 
+    String description, 
+    IconData icon, 
+    VoidCallback onTap, {
+    bool isNew = false,
+  }) {
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -269,13 +279,38 @@ class _HospitalDashboardViewState extends State<HospitalDashboardView> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: darkBlue,
-                      ),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            title,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: darkBlue,
+                            ),
+                          ),
+                        ),
+                        if (isNew)
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.green,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: const Text(
+                              'NEW',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                     const SizedBox(height: 4),
                     Text(

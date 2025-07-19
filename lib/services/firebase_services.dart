@@ -1186,7 +1186,7 @@ class FirebaseServices {
     }
   }
   
-  Future<Map<String, dynamic>?> generateDiagnosisAssist(String data,{
+  Future<dynamic> generateDiagnosisAssist(String data, {
   List<Map<String, dynamic>> selectedFiles = const [],
   File? imageFile,
 }) async {
@@ -1196,6 +1196,8 @@ class FirebaseServices {
     );
 
     Map<String, dynamic> payload = {'data': data};
+   
+    debugPrint("selectedfiless for diagnosis API: $selectedFiles");
 
     if (selectedFiles.isNotEmpty) {
       List<Map<String, String>> base64Files = [];
@@ -1215,19 +1217,40 @@ class FirebaseServices {
 
       payload['files'] = base64Files;
     }
-
+ debugPrint("Payload for diagnosis API: $payload");
     final HttpsCallableResult response = await getPat.call(payload);
-    final responseData = response.data as Map<String, dynamic>;
 
-    print(responseData);
+    // Ensure the response data is logged for debugging
+    debugPrint("Direct response: $response");
 
-    if (responseData['status'] == 'success') {
-      return responseData['data'] as Map<String, dynamic>; // includes result + imageUrls
+    // Handle the response data
+    if (response.data is Map) {
+      final responseData = Map<String, dynamic>.from(response.data);
+
+      if (responseData['status'] == 'success') {
+        debugPrint("Response status: ${responseData['data']}");
+        final dataField = responseData['data'];
+
+        if (dataField is String) {
+          debugPrint("'data' field is plain text, not JSON. Returning as-is.");
+          return dataField;
+        } else if (dataField is Map) {
+          debugPrint("'data' field is a map. Converting and returning.");
+          return Map<String, dynamic>.from(dataField);
+        } else {
+          debugPrint("Unexpected 'data' field type: ${dataField.runtimeType} - $dataField");
+          return null;
+        }
+      } else {
+        debugPrint("Response status is not 'success': ${responseData['status']}");
+        return null;
+      }
     } else {
+      debugPrint("Response data is not a Map: ${response.data.runtimeType}");
       return null;
     }
   } catch (error) {
-    print("Error calling diagnosis API: $error");
+    debugPrint("Error calling diagnosis API: $error");
     return null;
   }
 }
@@ -1369,11 +1392,11 @@ Future<dynamic> signUpHospital(
 
     print('[signUpHospital] Payload:');
     print({'password': '********', 'center': hospitalData}); // Mask password
-final accessCode = hospitalData['accessCode'];
+/* final accessCode = hospitalData['accessCode'];
     if (accessCode == null || accessCode.isEmpty) {
       print('[signUpHospital] Error: Access code is required.');
       return 'Access code is required.';
-    }
+    } */
     HttpsCallable signUp =
         FirebaseFunctions.instance.httpsCallable(functionName);
 

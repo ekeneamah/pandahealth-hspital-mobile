@@ -207,29 +207,36 @@ W/FirebaseContextProvider(12937): Error getting App Check token. Error: com.goog
         return false;
       }
       debugPrint("Generating AI analysis with fields: $fields");
+      debugPrint("Generating AI analysis with selectedFiles: $selectedFiles");
       // Generate AI analysis using the fields
       final analysis = await _firebaseServices.generateDiagnosisAssist(
   fields.toString(),
   selectedFiles: selectedFiles,
   imageFile: null,
 );
-
+debugPrint("AI analysis response: $analysis");
 if (analysis != null) {
+  debugPrint("Analysis object: $analysis");
   setState(() {
-    notesText = analysis['result'] ?? "No summary generated";
-    uploadedImageUrls = List<String>.from(analysis['imageUrls'] ?? []);
+    if (analysis is String) {
+      notesText = analysis;
+    } else if (analysis is Map<String, dynamic>) {
+      notesText = analysis['plainText'] ?? analysis['result'] ?? "No summary generated";
+      uploadedImageUrls = List<String>.from(analysis['imageUrls'] ?? []);
+    } else {
+      notesText = "No summary generated";
+    }
     loading = false;
   }); 
   return true;
 } else {
   showCustomErrorToast("Couldn't generate AI report");
+  debugPrint("AI analysis returned null or empty");
   return false;
 }
-      } catch (e) {
-    showCustomErrorToast("Couldn't generate AI report");
-      return false;
     } catch (e) {
-      showCustomErrorToast("Error generating report");
+      debugPrint("Error generating AI analysis: $e");
+      showCustomErrorToast("Couldn't generate AI report  $e");
       return false;
     } finally {
       setState(() => loading = false);
@@ -256,6 +263,8 @@ if (analysis != null) {
   }
 
   Future<bool> generateReport() async {
+    debugPrint("Generating report with fields: $fields");
+       debugPrint("Generating report with fields: $notesText");
     try {
       setState(() {
         loading = true;
@@ -1146,7 +1155,7 @@ if (analysis != null) {
     if (_currentStep == 1) {
       if (isFormValid()) {
         // Show confirmation dialog before proceeding
-        final shouldProceed = await showDialog<bool>(
+        final proceed = await showDialog<bool>(
           context: context,
           builder: (context) => AlertDialog(
             title: const Text('Confirm Proceed'),
@@ -1156,29 +1165,41 @@ if (analysis != null) {
             ),
             actions: [
               TextButton(
-                onPressed: () => Navigator.of(context).pop(false),
+                onPressed: () {
+                  print('Cancel button pressed'); // Debugging log
+                  Navigator.of(context).pop(false);
+                },
                 child: const Text('Cancel'),
               ),
               TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
+                onPressed: () {
+                  print('Proceed button pressed'); // Debugging log
+                  Navigator.of(context).pop(true);
+                },
                 child: const Text(
                   'Proceed',
-                  style:
-                      TextStyle(color: darkBlue, fontWeight: FontWeight.w600),
+                  style: TextStyle(color: darkBlue, fontWeight: FontWeight.w600),
                 ),
               ),
             ],
           ),
         );
 
-        if (shouldProceed == true) {
+        if (proceed == true) {
+          print('User confirmed to proceed'); // Debugging log
           final success = await generateReport();
           if (success) {
+            print('Report generated successfully'); // Debugging log
             setState(() => _currentStep++);
             _pageController.nextPage(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut,
             );
+          } else {
+            setState(() {
+        loading = false;
+      });
+            debugPrint('Failed to generate report'); // Debugging log
           }
         }
       } else {
@@ -1207,15 +1228,19 @@ if (analysis != null) {
         return;
       }
     }
+    final result  = await _firebaseServices.sendReportToDoctor(
+        reportId: reportId!,
+        doctorId: "tU0x5NG6U4bB8RZNl9g7CmezxqT2",
+      );
 
-    final result = await Navigator.push(
+   /*  final result = await Navigator.push(
       context,
       MaterialPageRoute(
         builder: (context) => SelectDoctorScreen(
           reportId: reportId!,
         ),
       ),
-    );
+    ); */
 
     if (result == true) {
       showCustomToast('Report shared successfully');
